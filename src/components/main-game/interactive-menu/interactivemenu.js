@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { render } from "react-dom";
 import { Text } from "react-native-web";
 
 const InteractiveMenu = () => {
@@ -7,7 +8,8 @@ const InteractiveMenu = () => {
   const [diceRolled, updateDiceRoll] = useState(false);
   const [faceSelected, updateFaceSelected] = useState();
   const [quantitySelected, updateQuantitySelected] = useState(0);
-  // const [{ previousFace, previousQuantity }, updatePreviousCall] = useState();
+  const [previousFace, updatePreviousFace] = useState();
+  const [previousQuantity, updatePreviousQuantity] = useState();
   const NUMBER_OF_DICE_PER_HAND = 5;
 
   const rollDice = () => {
@@ -37,19 +39,20 @@ const InteractiveMenu = () => {
 
   const selectFace = (face) => {
     updateFaceSelected(face);
-    console.log(`FACE SELECTED: ${face}`);
   };
 
-  const faceSelection = (
-    <div>
-      <button onClick={() => selectFace(1)}>1</button>
-      <button onClick={() => selectFace(2)}>2</button>
-      <button onClick={() => selectFace(3)}>3</button>
-      <button onClick={() => selectFace(4)}>4</button>
-      <button onClick={() => selectFace(5)}>5</button>
-      <button onClick={() => selectFace(6)}>6</button>
-    </div>
-  );
+  const FaceSelection = () => {
+    return (
+      <div>
+        <button onClick={() => selectFace(1)}>1</button>
+        <button onClick={() => selectFace(2)}>2</button>
+        <button onClick={() => selectFace(3)}>3</button>
+        <button onClick={() => selectFace(4)}>4</button>
+        <button onClick={() => selectFace(5)}>5</button>
+        <button onClick={() => selectFace(6)}>6</button>
+      </div>
+    );
+  };
 
   const incrementQuantity = (increment) => {
     if (quantitySelected > 0 || increment > 0) {
@@ -57,24 +60,75 @@ const InteractiveMenu = () => {
     }
   };
 
-  const currentCall = (
-    <div>
-      <Text>
-        Current Call:
-        {"\n"}
-        Face: {faceSelected}
-        {"\n"}
-        Quantity: {quantitySelected}
-      </Text>
-    </div>
-  );
+  const CurrentCall = () => {
+    return (
+      <div>
+        <Text>
+          Current Call:
+          {"\n"}
+          Quantity: {quantitySelected}
+          {"\n"}
+          Face: {faceSelected}
+        </Text>
+      </div>
+    );
+  };
 
-  const quantitySelection = (
-    <div>
-      <button onClick={() => incrementQuantity(+1)}>+</button>
-      <button onClick={() => incrementQuantity(-1)}>-</button>
-    </div>
-  );
+  const QuantitySelectionButton = () => {
+    return (
+      <div>
+        <button onClick={() => incrementQuantity(+1)}>+</button>
+        <button onClick={() => incrementQuantity(-1)}>-</button>
+      </div>
+    );
+  };
+
+  const callRaise = () => {
+    // this will need to save to the previous call
+    updatePreviousQuantity(quantitySelected);
+    updatePreviousFace(faceSelected);
+    alert(`Your call was: ${quantitySelected} ${faceSelected}`);
+  };
+
+  const CallRaiseButton = () => {
+    return (
+      // do something with faceSelected and quantitySelected; submit it to some other state or update some state
+      // { faceSelected, quantitySelected }
+      // onClick={() => updateBluff(quantitySelected)}
+      <div>
+        <CurrentCall />
+        <button onClick={callRaise}>Raise</button>
+      </div>
+    );
+  };
+
+  const callBluffChecker = () => {
+    // could optionally use the previous player's id in the call
+    alert(`CALLING OUT PREVIOUS PLAYER BLUFF!`);
+  };
+
+  const CallBluffButton = () => {
+    return (
+      <div>
+        <button onClick={callBluffChecker}>Call Bluff</button>
+      </div>
+    );
+  };
+
+  const PreviousCall = () => {
+    if (previousFace === 0 && previousQuantity) {
+      return null;
+    } else {
+      return (
+        <div>
+          <Text>
+            <p>Previous Call:</p>
+            {previousQuantity} {previousFace}
+          </Text>
+        </div>
+      );
+    }
+  };
 
   return (
     <div>
@@ -83,9 +137,14 @@ const InteractiveMenu = () => {
         Roll
       </button>
       {diceRolled ? displayHand(playerHand) : null}
-      {currentCall}
-      {diceRolled ? faceSelection : null}
-      {diceRolled ? quantitySelection : null}
+      {diceRolled ? <QuantitySelectionButton /> : null}
+      {diceRolled ? <FaceSelection /> : null}
+      <PreviousCall />
+      <div>
+        Actions
+        <CallBluffButton />
+        <CallRaiseButton />
+      </div>
     </div>
   );
 };
