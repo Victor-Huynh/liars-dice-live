@@ -3,13 +3,15 @@ import { render } from "react-dom";
 import { Text } from "react-native-web";
 
 const InteractiveMenu = () => {
-  // const [playersHands, updatePlayersHands] = useState(0);
+  const [tableHand, updateTableHand] = useState({});
   const [playerHand, updatePlayerHand] = useState({});
   const [diceRolled, updateDiceRoll] = useState(false);
   const [faceSelected, updateFaceSelected] = useState();
   const [quantitySelected, updateQuantitySelected] = useState(0);
   const [previousFace, updatePreviousFace] = useState();
   const [previousQuantity, updatePreviousQuantity] = useState();
+  const [currentPlayersTurn, updateCurrentPlayersTurn] = useState();
+  const [listOfPlayers, updateListOfPlayers] = useState();
   const NUMBER_OF_DICE_PER_HAND = 5;
 
   const rollDice = () => {
@@ -20,6 +22,7 @@ const InteractiveMenu = () => {
         diceHand[die] === undefined ? (diceHand[die] = 1) : diceHand[die]++;
       }
       updatePlayerHand(diceHand);
+      updateTableHand({ ...tableHand, ...diceHand });
       updateDiceRoll(true);
     }
   };
@@ -92,9 +95,6 @@ const InteractiveMenu = () => {
 
   const CallRaiseButton = () => {
     return (
-      // do something with faceSelected and quantitySelected; submit it to some other state or update some state
-      // { faceSelected, quantitySelected }
-      // onClick={() => updateBluff(quantitySelected)}
       <div>
         <CurrentCall />
         <button onClick={callRaise}>Raise</button>
@@ -105,6 +105,14 @@ const InteractiveMenu = () => {
   const callBluffChecker = () => {
     // could optionally use the previous player's id in the call
     alert(`CALLING OUT PREVIOUS PLAYER BLUFF!`);
+    let face = previousFace;
+    console.log(playerHand);
+    console.log(`TABLE HAND ${Object.keys(tableHand)}`);
+    if (playerHand[face] >= previousQuantity) {
+      console.log("THE CALL IS CORRECT, YOU GOT BLUFFED OUT");
+    } else {
+      console.log("THE CALL IS A BLUFF, YOU CALLED THE BLUFF CORRECTLY");
+    }
   };
 
   const CallBluffButton = () => {
